@@ -8,7 +8,8 @@ import numpy as np
 import cv2
 from PIL import Image
 import torchvision.transforms as transforms
-
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from models import densenet
 from utils.gradcam import GradCAM
 
