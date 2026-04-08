@@ -18,18 +18,25 @@ from utils.gradcam import GradCAM
 # -------------------
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-# -------------------
-# LOAD MODEL
-# -------------------
 @st.cache_resource
 def load_model():
+    model_path = "outputs/checkpoints/densenet121.pt"
+
+    if not os.path.exists(model_path):
+        st.error("❌ Model file not found. Please check deployment.")
+        st.stop()
+
     model = densenet.get_model().to(device)
-    model.load_state_dict(torch.load("outputs/checkpoints/densenet121.pt", map_location=device))
+
+    try:
+        state_dict = torch.load(model_path, map_location=device)
+        model.load_state_dict(state_dict)
+    except Exception as e:
+        st.error(f"Model loading failed: {e}")
+        st.stop()
+
     model.eval()
     return model
-
-model = load_model()
-gradcam = GradCAM(model, model.features[-1])
 
 # -------------------
 # TRANSFORM
@@ -98,4 +105,4 @@ if uploaded_file:
     st.warning("""
     Grad-CAM highlights where the model is focusing, not exact disease location.
     It provides interpretability, not precise medical segmentation.
-    """)
+    """)@st.cache_resource
